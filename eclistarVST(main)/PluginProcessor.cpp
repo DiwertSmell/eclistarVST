@@ -150,12 +150,17 @@ juce::AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 //==============================================================================
 void EclistarVSTAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-   
+    juce::MemoryOutputStream memOstr(destData, true);
+    apvts.state.writeToStream(memOstr);
 }
 
 void EclistarVSTAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    
+    auto vTree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if (vTree.isValid())
+    {
+        apvts.replaceState(vTree);
+    }
 }
 
 //==============================================================================
