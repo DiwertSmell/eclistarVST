@@ -1,22 +1,30 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-using namespace juce;
-using namespace std;
-
 //==============================================================================
 EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
                       #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                       .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        )
 #endif
 {
+    _attack = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Attack"));
+    jassert(_attack != nullptr);   
+
+    _release = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Release"));
+    jassert(_release != nullptr);
+
+    _threshold = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Threshold"));
+    jassert(_threshold != nullptr);
+
+    _ratio = dynamic_cast<AudioParameterChoice*>(apvts.getParameter("Ratio"));
+    jassert(_ratio!= nullptr);
 }
 
 EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
@@ -24,7 +32,7 @@ EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
 }
 
 //==============================================================================
-const juce::String EclistarVSTAudioProcessor::getName() const
+const String EclistarVSTAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
@@ -75,7 +83,7 @@ void EclistarVSTAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String EclistarVSTAudioProcessor::getProgramName (int index)
+const String EclistarVSTAudioProcessor::getProgramName (int index)
 {
     return {};
 }
@@ -87,7 +95,13 @@ void EclistarVSTAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void EclistarVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    
+    dsp::ProcessSpec processSpec;
+
+    processSpec.maximumBlockSize = samplesPerBlock;
+    processSpec.numChannels = getTotalNumOutputChannels();
+    processSpec.sampleRate = sampleRate;
+
+    _compressor.prepare(processSpec);
 }
 
 void EclistarVSTAudioProcessor::releaseResources()
@@ -99,12 +113,12 @@ void EclistarVSTAudioProcessor::releaseResources()
 bool EclistarVSTAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+    ignoreUnused (layouts);
     return true;
   #else
     
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
+     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
         return false;
 
    #if ! JucePlugin_IsSynth
@@ -117,23 +131,25 @@ bool EclistarVSTAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
-void EclistarVSTAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
+    ScopedNoDenormals noDenormals;
+    auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+        buffer.clear(i, 0, buffer.getNumSamples());
 
-    
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    _compressor.setAttack(_attack->get());
+    _compressor.setRelease(_release->get());
+    _compressor.setThreshold(_threshold->get());
+    _compressor.setRatio(_ratio->getCurrentChoiceName().getFloatValue());
 
-        // ..do something to the data...
-    }
+
+    auto audioBlock = dsp::AudioBlock<float>(buffer);
+    auto context = dsp::ProcessContextReplacing<float>(audioBlock);
+
+    _compressor.process(context);
 }
 
 //==============================================================================
@@ -144,19 +160,19 @@ bool EclistarVSTAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 {
-    return new juce::GenericAudioProcessorEditor (*this);
+    return new GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void EclistarVSTAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void EclistarVSTAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    juce::MemoryOutputStream memOstr(destData, true);
+    MemoryOutputStream memOstr(destData, true);
     apvts.state.writeToStream(memOstr);
 }
 
 void EclistarVSTAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    auto vTree = juce::ValueTree::readFromData(data, sizeInBytes);
+    auto vTree = ValueTree::readFromData(data, sizeInBytes);
     if (vTree.isValid())
     {
         apvts.replaceState(vTree);
@@ -164,14 +180,14 @@ void EclistarVSTAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 //==============================================================================
-juce::AudioProcessorValueTreeState::ParameterLayout
+AudioProcessorValueTreeState::ParameterLayout
 EclistarVSTAudioProcessor::createParameterLayout()
 {
     auto choicesVal = vector<double>{ 1,1.5,2,3,4,5,7,9,10,15,20,50,100 };
-    juce::StringArray strArr;
+    StringArray strArr;
     for (auto choice : choicesVal)
     {
-        strArr.add(juce::String(choice, 1));
+        strArr.add(String(choice, 1));
     }
 
     APVTS::ParameterLayout layout;
@@ -194,7 +210,7 @@ EclistarVSTAudioProcessor::createParameterLayout()
 }
 
 //==============================================================================
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new EclistarVSTAudioProcessor();
 }
