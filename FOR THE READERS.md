@@ -2,6 +2,7 @@
 > JUCE simplifies code writing, file linking and assembly using built-in methods, macros, etc., but also requires special specifics when working with audio systems.
 
 Next, the main elements will be given to simplify not so much reading as understanding the code.
+
 __Full documentation is__ [___here___](https://docs.juce.com/master/group__juce__core-system.html)
 ***
 ### JUCE elements
