@@ -14,17 +14,20 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
                        )
 #endif
 {
-    _attack = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Attack"));
-    jassert(_attack != nullptr);   
+    compressor.ratio = dynamic_cast<AudioParameterChoice*>(apvts.getParameter("Ratio"));
+    jassert(compressor.ratio != nullptr);
 
-    _release = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Release"));
-    jassert(_release != nullptr);
+    compressor.attack = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Attack"));
+    jassert(compressor.attack != nullptr);   
 
-    _threshold = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Threshold"));
-    jassert(_threshold != nullptr);
+    compressor.release = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Release"));
+    jassert(compressor.release != nullptr);
 
-    _ratio = dynamic_cast<AudioParameterChoice*>(apvts.getParameter("Ratio"));
-    jassert(_ratio!= nullptr);
+    compressor.threshold = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Threshold"));
+    jassert(compressor.threshold != nullptr);
+
+    compressor.bypassed = dynamic_cast<AudioParameterBool*>(apvts.getParameter("Bypassed"));
+    jassert(compressor.bypassed != nullptr);
 }
 
 EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
@@ -88,7 +91,7 @@ const String EclistarVSTAudioProcessor::getProgramName (int index)
     return {};
 }
 
-void EclistarVSTAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void EclistarVSTAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
@@ -101,7 +104,7 @@ void EclistarVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     processSpec.numChannels = getTotalNumOutputChannels();
     processSpec.sampleRate = sampleRate;
 
-    _compressor.prepare(processSpec);
+    compressor.prepare(processSpec);
 }
 
 void EclistarVSTAudioProcessor::releaseResources()
@@ -140,7 +143,8 @@ void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    _compressor.setAttack(_attack->get());
+   /*
+   _compressor.setAttack(_attack->get());
     _compressor.setRelease(_release->get());
     _compressor.setThreshold(_threshold->get());
     _compressor.setRatio(_ratio->getCurrentChoiceName().getFloatValue());
@@ -149,7 +153,13 @@ void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     auto audioBlock = dsp::AudioBlock<float>(buffer);
     auto context = dsp::ProcessContextReplacing<float>(audioBlock);
 
+    context.isBypassed = _bypassed->get();
+
     _compressor.process(context);
+    */
+
+    compressor.updateVstCompressorSettings();
+    compressor.processing(buffer);
 }
 
 //==============================================================================
@@ -158,7 +168,7 @@ bool EclistarVSTAudioProcessor::hasEditor() const
     return true; 
 }
 
-juce::AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
+AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 {
     return new GenericAudioProcessorEditor (*this);
 }
@@ -205,6 +215,9 @@ EclistarVSTAudioProcessor::createParameterLayout()
     layout.add(make_unique<AudioParameterChoice>("Ratio",
                                                  "Ratio",
                                                   strArr, 3));
+    layout.add(make_unique<AudioParameterBool>("Bypassed",
+                                               "Bypassed",
+                                                false));
 
     return layout;
 }
