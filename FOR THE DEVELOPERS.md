@@ -15,6 +15,7 @@ __Full documentation is__ [___here___](https://docs.juce.com/master/group__juce_
 * __jassert()__ - Platform-independent assertion macro. Defined as a function.
 
 ***
-### Detailed information
+# Detailed information
+### Compression and acoustics
 * [Multiband Compression](https://emastered.com/blog/what-is-multiband-compression)
 * [Fifth music system](https://habr.com/ru/post/653621/)
