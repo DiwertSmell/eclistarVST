@@ -16,6 +16,9 @@ __Full documentation is__ [___here___](https://docs.juce.com/master/group__juce_
 
 ***
 # Detailed information
-### Compression and acoustics
-* [Multiband Compression](https://emastered.com/blog/what-is-multiband-compression)
-* [Fifth music system](https://habr.com/ru/post/653621/)
+* __Compression__
+  * [Fifth music system](https://habr.com/ru/post/653621/) 
+  * [Multiband Compression](https://emastered.com/blog/what-is-multiband-compression)
+* __Crossover__
+  * [Linkwitz filter](https://ru.wikipedia.org/wiki/Фильтр_Линквица_—_Райли)
+  * [Audio crossover](https://translated.turbopages.org/proxy_u/en-ru.ru.468b2b81-640c482b-8ca731a4-74722d776562/https/en.wikipedia.org/wiki/Audio_crossover_capacitor)
