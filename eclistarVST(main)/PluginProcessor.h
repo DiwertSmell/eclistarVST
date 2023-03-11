@@ -6,6 +6,69 @@ using namespace juce;
 using namespace std;
 
 
+namespace Parameters
+{
+    enum NamesOfParameters
+    {
+        ratioLowBand,
+        ratioMidBand,
+        ratioHighBand,
+
+        attackLowBand,
+        attackMidBand,
+        attackHighBand,
+
+        releaseLowBand,
+        releaseMidBand,
+        releaseHighBand,
+
+        thresholdLowBand,
+        thresholdMidBand,
+        thresholdHighBand,
+
+        //==============================================================================
+
+        bypassedLowBand,
+        bypassedMidBand,
+        bypassedHighBand,
+
+        lowMidCrossoverFreq,
+        midHighCrossoverFreq,
+    };
+
+    const map<NamesOfParameters, String>& GetParameters()
+    {
+        static map<NamesOfParameters, String> parameters =
+        {
+            { ratioLowBand, "Ratio Low Band" },
+            { ratioMidBand, "Ratio Mid Band" },
+            { ratioHighBand, "Ratio High Band" },
+
+            { attackLowBand, "Attack Low Band" },
+            { attackMidBand, "Attack Mid Band" },
+            { attackHighBand, "Attack High Band" },
+
+            { releaseLowBand, "Release Low Band" },
+            { releaseMidBand, "Release Mid Band" },
+            { releaseHighBand, "Release High Band" },
+
+            { thresholdLowBand, "Threshold Low Band" },
+            { thresholdMidBand, "Threshold Mid Band" },
+            { thresholdHighBand, "Threshold High Band" },
+
+            { bypassedLowBand, "Bypassed Low Band" },
+            { bypassedMidBand, "Bypassed Mid Band" },
+            { bypassedHighBand, "Bypassed High Band" },
+
+            { lowMidCrossoverFreq, "Low-Mid Crossover Frequency" },
+            { midHighCrossoverFreq, "Mid-High Crossover Frequency" }
+        };
+
+        return parameters;
+    }
+}
+
+
 struct VstCompressorBand
 {
 private:
@@ -56,10 +119,12 @@ class EclistarVSTAudioProcessor  : public AudioProcessor
 {
 public:
     //==============================================================================
+
     EclistarVSTAudioProcessor();
     ~EclistarVSTAudioProcessor() override;
 
     //==============================================================================
+
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -70,10 +135,12 @@ public:
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
 
     //==============================================================================
+
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
     //==============================================================================
+
     const String getName() const override;
 
     bool acceptsMidi() const override;
@@ -82,6 +149,7 @@ public:
     double getTailLengthSeconds() const override;
 
     //==============================================================================
+
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
@@ -89,6 +157,7 @@ public:
     void changeProgramName (int index, const String& newName) override;
 
     //==============================================================================
+
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
@@ -99,21 +168,7 @@ public:
 
 
 private:
-    //==============================================================================
-    /*
-    dsp::Compressor<float> _compressor;
-
-
-    AudioParameterFloat* _attack{ nullptr };
-    AudioParameterFloat* _release{ nullptr };
-    AudioParameterFloat* _threshold{ nullptr };
-
-    AudioParameterChoice* _ratio{ nullptr };
-
-    AudioParameterBool* _bypassed{ nullptr };
-
-    */
-
+    
     VstCompressorBand compressor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EclistarVSTAudioProcessor)

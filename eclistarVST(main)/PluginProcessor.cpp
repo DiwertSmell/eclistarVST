@@ -1,7 +1,10 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+using namespace Parameters;
+
 //==============================================================================
+
 EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
@@ -14,20 +17,34 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
                        )
 #endif
 {
-    compressor.ratio = dynamic_cast<AudioParameterChoice*>(apvts.getParameter("Ratio"));
-    jassert(compressor.ratio != nullptr);
+    const auto& parameters = GetParameters();
 
-    compressor.attack = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Attack"));
-    jassert(compressor.attack != nullptr);   
+    auto Fhelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
+    {
+        parameter = dynamic_cast<AudioParameterFloat*>(apvts.getParameter(parameters.at(parameterName)));
+        jassert(parameter != nullptr);
+    };
 
-    compressor.release = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Release"));
-    jassert(compressor.release != nullptr);
+    auto Chelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
+    {
+        parameter = dynamic_cast<AudioParameterChoice*>(apvts.getParameter(parameters.at(parameterName)));
+        jassert(parameter != nullptr);
+    };
 
-    compressor.threshold = dynamic_cast<AudioParameterFloat*>(apvts.getParameter("Threshold"));
-    jassert(compressor.threshold != nullptr);
+    auto Bhelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
+    {
+        parameter = dynamic_cast<AudioParameterBool*>(apvts.getParameter(parameters.at(parameterName)));
+        jassert(parameter != nullptr);
+    };
 
-    compressor.bypassed = dynamic_cast<AudioParameterBool*>(apvts.getParameter("Bypassed"));
-    jassert(compressor.bypassed != nullptr);
+
+    Fhelper(compressor.attack, NamesOfParameters::attackLowBand);
+    Fhelper(compressor.release, NamesOfParameters::releaseLowBand);
+    Fhelper(compressor.threshold, NamesOfParameters::thresholdLowBand);
+
+    Chelper(compressor.ratio, NamesOfParameters::ratioLowBand);
+
+    Bhelper(compressor.bypassed, NamesOfParameters::bypassedLowBand);
 }
 
 EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
@@ -35,6 +52,7 @@ EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
 }
 
 //==============================================================================
+
 const String EclistarVSTAudioProcessor::getName() const
 {
     return JucePlugin_Name;
@@ -96,6 +114,7 @@ void EclistarVSTAudioProcessor::changeProgramName (int index, const String& newN
 }
 
 //==============================================================================
+
 void EclistarVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec processSpec;
@@ -143,26 +162,13 @@ void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-   /*
-   _compressor.setAttack(_attack->get());
-    _compressor.setRelease(_release->get());
-    _compressor.setThreshold(_threshold->get());
-    _compressor.setRatio(_ratio->getCurrentChoiceName().getFloatValue());
-
-
-    auto audioBlock = dsp::AudioBlock<float>(buffer);
-    auto context = dsp::ProcessContextReplacing<float>(audioBlock);
-
-    context.isBypassed = _bypassed->get();
-
-    _compressor.process(context);
-    */
 
     compressor.updateVstCompressorSettings();
     compressor.processing(buffer);
 }
 
 //==============================================================================
+
 bool EclistarVSTAudioProcessor::hasEditor() const
 {
     return true; 
@@ -174,6 +180,7 @@ AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 }
 
 //==============================================================================
+
 void EclistarVSTAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     MemoryOutputStream memOstr(destData, true);
@@ -190,39 +197,45 @@ void EclistarVSTAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 //==============================================================================
+
 AudioProcessorValueTreeState::ParameterLayout
 EclistarVSTAudioProcessor::createParameterLayout()
 {
+    auto attackReRange = NormalisableRange<float>(5, 500, 1, 1);
     auto choicesVal = vector<double>{ 1,1.5,2,3,4,5,7,9,10,15,20,50,100 };
+
     StringArray strArr;
     for (auto choice : choicesVal)
     {
         strArr.add(String(choice, 1));
     }
 
-    APVTS::ParameterLayout layout;
-    layout.add(make_unique<AudioParameterFloat>("Threshold",
-                                                "Threshold",
-                                                 NormalisableRange<float>(-60, 12, 1, 1), 0));
 
-    auto attackReRange = NormalisableRange<float>(5, 500, 1, 1);
-    layout.add(make_unique<AudioParameterFloat>("Attack",
-                                                "Attack",
-                                                 attackReRange, 0));
-    layout.add(make_unique<AudioParameterFloat>("Release",
-                                                "Release",
-                                                 attackReRange, 250));
-    layout.add(make_unique<AudioParameterChoice>("Ratio",
-                                                 "Ratio",
-                                                  strArr, 3));
-    layout.add(make_unique<AudioParameterBool>("Bypassed",
-                                               "Bypassed",
-                                                false));
+    APVTS::ParameterLayout layout;
+    const auto& parameters = GetParameters();
+
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::thresholdLowBand),
+                                                parameters.at(NamesOfParameters::thresholdLowBand),
+                                                NormalisableRange<float>(-60, 12, 1, 1), 0));
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::attackLowBand),
+                                                parameters.at(NamesOfParameters::attackLowBand),
+                                                attackReRange, 0));
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::releaseLowBand),
+                                                parameters.at(NamesOfParameters::releaseLowBand),
+                                                attackReRange, 250));
+    layout.add(make_unique<AudioParameterChoice>(parameters.at(NamesOfParameters::ratioLowBand),
+                                                 parameters.at(NamesOfParameters::ratioLowBand),
+                                                 strArr, 3));
+    layout.add(make_unique<AudioParameterBool>(parameters.at(NamesOfParameters::bypassedLowBand),
+                                               parameters.at(NamesOfParameters::bypassedLowBand),
+                                               false));
 
     return layout;
 }
 
 //==============================================================================
+
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new EclistarVSTAudioProcessor();

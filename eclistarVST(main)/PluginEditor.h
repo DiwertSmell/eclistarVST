@@ -3,15 +3,17 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+using namespace juce;
 
-class EclistarVSTAudioProcessorEditor  : public juce::AudioProcessorEditor
+
+class EclistarVSTAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
     EclistarVSTAudioProcessorEditor (EclistarVSTAudioProcessor&);
     ~EclistarVSTAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
