@@ -25,3 +25,5 @@ __Full documentation is__ [___here___](https://docs.juce.com/master/group__juce_
 * __Acoustics__
   * [432Hz & 440Hz](https://samesound.ru/write/116025-432hz-vs-440hz)
   * [Mathematics of the musical system](https://rainy-sunny.livejournal.com/403437.html)
+***
+
