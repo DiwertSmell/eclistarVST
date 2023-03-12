@@ -9,4 +9,7 @@ It is based on the classical structures of MIDI plug-ins, [DSP](https://ru.wikip
 * [Encoding of audio information](https://habr.com/ru/post/503786/)
 * [Nyquist — Mikhailov stability criterion](https://ru.wikipedia.org/wiki/Критерий_устойчивости_Найквиста_—_Михайлова)
 * [Engineering Acoustics/ Human Ear and Sound Perception](https://en.m.wikibooks.org/wiki/Engineering_Acoustics/The_Human_Ear_and_Sound_Perception)
+***
+### Thankfulness
+* [Martin Finke](https://www.martin-finke.de/tags/making_audio_plugins.html)
 
