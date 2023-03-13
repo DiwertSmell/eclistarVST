@@ -7,7 +7,7 @@ It is based on the classical structures of MIDI plug-ins, [DSP](https://ru.wikip
 * [Audio Compressor](https://ru.wikipedia.org/wiki/Компрессор_аудиосигнала)
 * [Audio codec in JUCE](https://russianblogs.com/article/98632951460/)
 * [Encoding of audio information](https://habr.com/ru/post/503786/)
-* [Nyquist — Mikhailov stability criterion](https://ru.wikipedia.org/wiki/Критерий_устойчивости_Найквиста_—_Михайлова)
+* [Nyquist — Mikhailov stability criterion](https://ru.wikipedia.org/wiki/Критерий_устойчивости_Найквиста_—_Михайлова) [*](https://ru.wikipedia.org/wiki/Частота_Найквиста)
 * [Engineering Acoustics/ Human Ear and Sound Perception](https://en.m.wikibooks.org/wiki/Engineering_Acoustics/The_Human_Ear_and_Sound_Perception)
 ***
 ### Thankfulness
