@@ -3,13 +3,17 @@
 #include <JuceHeader.h>
 
 using namespace juce;
+using namespace dsp;
 using namespace std;
 
+// Namespace of compressor parameters
 
 namespace Parameters
 {
     enum NamesOfParameters
     {
+        // Names of the main parameters
+
         ratioLowBand,
         ratioMidBand,
         ratioHighBand,
@@ -26,7 +30,7 @@ namespace Parameters
         thresholdMidBand,
         thresholdHighBand,
 
-        //==============================================================================
+        // Names of additional parameters and channels
 
         bypassedLowBand,
         bypassedMidBand,
@@ -68,15 +72,18 @@ namespace Parameters
     }
 }
 
+// Structure of compressor
 
 struct VstCompressorBand
 {
 private:
 
-    dsp::Compressor<float> _compressor;
+    Compressor<float> __compressor;
 
 public:
-    
+
+    // Elements of compressor
+
     AudioParameterChoice* ratio{ nullptr };
 
     AudioParameterBool* bypassed{ nullptr };
@@ -85,32 +92,33 @@ public:
     AudioParameterFloat* release{ nullptr };
     AudioParameterFloat* threshold{ nullptr };
 
-    //==============================================================================
+    // Functions of the compressor itself
 
-    void prepare(const dsp::ProcessSpec& processSpec)
+    void prepare(const ProcessSpec& processSpec)
     {
-        _compressor.prepare(processSpec);
+        __compressor.prepare(processSpec);
     }
 
     void updateVstCompressorSettings()
     {
-        _compressor.setAttack(attack->get());
-        _compressor.setRelease(release->get());
-        _compressor.setThreshold(threshold->get());
-        _compressor.setRatio(ratio->getCurrentChoiceName().getFloatValue());
+        __compressor.setAttack(attack->get());
+        __compressor.setRelease(release->get());
+        __compressor.setThreshold(threshold->get());
+        __compressor.setRatio(ratio->getCurrentChoiceName().getFloatValue());
     }
 
     void processing(AudioBuffer<float>& buffer)
     {
-        auto audioBlock = dsp::AudioBlock<float>(buffer);
-        auto context = dsp::ProcessContextReplacing<float>(audioBlock);
+        auto audioBlock = AudioBlock<float>(buffer);
+        auto context = ProcessContextReplacing<float>(audioBlock);
 
         context.isBypassed = bypassed->get();
 
-        _compressor.process(context);
+        __compressor.process(context);
     }
 };
 
+// Class of processor compressor
 
 class EclistarVSTAudioProcessor  : public AudioProcessor
                             #if JucePlugin_Enable_ARA
@@ -118,7 +126,6 @@ class EclistarVSTAudioProcessor  : public AudioProcessor
                             #endif
 {
 public:
-    //==============================================================================
 
     EclistarVSTAudioProcessor();
     ~EclistarVSTAudioProcessor() override;
@@ -168,8 +175,19 @@ public:
 
 
 private:
-    
-    VstCompressorBand compressor;
+    //==============================================================================
+    // The following are the elements of the compressor, Linkwitz filter
+
+    VstCompressorBand _compressor;
+
+    using Filter = juce::dsp::LinkwitzRileyFilter<float>;
+    Filter _LP,
+           _HP;
+
+    juce::AudioParameterFloat* _lowMidCrossover{ nullptr };
+    std::array<juce::AudioBuffer<float>, 2> _multiFilterBuffers;
+
+    //==============================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EclistarVSTAudioProcessor)
 };
