@@ -3,7 +3,7 @@
 
 Next, the main elements will be given to simplify not so much reading as understanding the code.
 
-__Full documentation is__ [___here___](https://docs.juce.com/master/group__juce__core-system.html)
+__Full documentation is__ [___here___](https://docs.juce.com/develop/index.html)
 ***
 ### JUCE elements
 ##### MACROS
