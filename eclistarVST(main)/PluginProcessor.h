@@ -8,7 +8,7 @@ using namespace std;
 
 // Namespace of compressor parameters
 
-namespace Parameters
+namespace compressor_parameters
 {
     enum NamesOfParameters
     {
@@ -72,13 +72,14 @@ namespace Parameters
     }
 }
 
+
 // Structure of compressor
 
 struct VstCompressorBand
 {
 private:
 
-    Compressor<float> __compressor;
+    Compressor<float> _compressor_;
 
 public:
 
@@ -94,27 +95,27 @@ public:
 
     // Functions of the compressor itself
 
-    void prepare(const ProcessSpec& processSpec)
+    void prepare(const ProcessSpec& process_spec)
     {
-        __compressor.prepare(processSpec);
+        _compressor_.prepare(process_spec);
     }
 
     void updateVstCompressorSettings()
     {
-        __compressor.setAttack(attack->get());
-        __compressor.setRelease(release->get());
-        __compressor.setThreshold(threshold->get());
-        __compressor.setRatio(ratio->getCurrentChoiceName().getFloatValue());
+        _compressor_.setAttack(attack->get());
+        _compressor_.setRelease(release->get());
+        _compressor_.setThreshold(threshold->get());
+        _compressor_.setRatio(ratio->getCurrentChoiceName().getFloatValue());
     }
 
     void processing(AudioBuffer<float>& buffer)
     {
-        auto audioBlock = AudioBlock<float>(buffer);
-        auto context = ProcessContextReplacing<float>(audioBlock);
+        auto audio_block = AudioBlock<float>(buffer);
+        auto context = ProcessContextReplacing<float>(audio_block);
 
         context.isBypassed = bypassed->get();
 
-        __compressor.process(context);
+        _compressor_.process(context);
     }
 };
 
@@ -130,9 +131,9 @@ public:
     EclistarVSTAudioProcessor();
     ~EclistarVSTAudioProcessor() override;
 
-    //==============================================================================
+//==============================================================================
 
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void prepareToPlay (double sample_rate, int samples_per_block) override;
     void releaseResources() override;
 
    #ifndef JucePlugin_PreferredChannelConfigurations
@@ -141,12 +142,12 @@ public:
 
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
 
-    //==============================================================================
+//==============================================================================
 
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
-    //==============================================================================
+//==============================================================================
 
     const String getName() const override;
 
@@ -155,18 +156,18 @@ public:
     bool isMidiEffect() const override;
     double getTailLengthSeconds() const override;
 
-    //==============================================================================
+//==============================================================================
 
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
-    void changeProgramName (int index, const String& newName) override;
+    void changeProgramName (int index, const String& new_name) override;
 
-    //==============================================================================
+//==============================================================================
 
-    void getStateInformation (MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
+    void getStateInformation (MemoryBlock& destination_data) override;
+    void setStateInformation (const void* data, int size_in_bytes) override;
 
     using APVTS = AudioProcessorValueTreeState;
     static APVTS::ParameterLayout createParameterLayout();
@@ -175,19 +176,22 @@ public:
 
 
 private:
-    //==============================================================================
-    // The following are the elements of the compressor, Linkwitz filter
+//==============================================================================
+// The following are the elements of the compressor, Linkwitz filter
 
     VstCompressorBand _compressor;
 
-    using Filter = juce::dsp::LinkwitzRileyFilter<float>;
+    using Filter = LinkwitzRileyFilter<float>;
     Filter _LP,
-           _HP;
+           _HP,
+           _AP;
 
-    juce::AudioParameterFloat* _lowMidCrossover{ nullptr };
-    std::array<juce::AudioBuffer<float>, 2> _multiFilterBuffers;
+    AudioParameterFloat* _low_mid_crossover{ nullptr };
 
-    //==============================================================================
+    AudioBuffer<float> _all_pass_buffer;
+    array<AudioBuffer<float>, 2> _multi_filter_buffers;
+
+//==============================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EclistarVSTAudioProcessor)
 };

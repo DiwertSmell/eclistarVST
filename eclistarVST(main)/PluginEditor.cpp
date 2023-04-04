@@ -2,8 +2,9 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-EclistarVSTAudioProcessorEditor::EclistarVSTAudioProcessorEditor (EclistarVSTAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+
+EclistarVSTAudioProcessorEditor::EclistarVSTAudioProcessorEditor (EclistarVSTAudioProcessor& processor)
+    : AudioProcessorEditor (&processor), audio_processor (processor)
 {
     setSize (400, 300);
 }
@@ -13,14 +14,14 @@ EclistarVSTAudioProcessorEditor::~EclistarVSTAudioProcessorEditor()
 }
 
 //==============================================================================
-void EclistarVSTAudioProcessorEditor::paint (Graphics& g)
+void EclistarVSTAudioProcessorEditor::paint (Graphics& graphics)
 {
     
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    graphics.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
-    g.setColour (Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
+    graphics.setColour (Colours::white);
+    graphics.setFont (15.0f);
+    graphics.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
 }
 
 void EclistarVSTAudioProcessorEditor::resized()
