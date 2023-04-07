@@ -28,7 +28,7 @@ __Full documentation is__ [___here___](https://docs.juce.com/develop/index.html)
   * [Linkwitz filter](https://ru.wikipedia.org/wiki/Фильтр_Линквица_—_Райли)
   * [Audio crossover](https://translated.turbopages.org/proxy_u/en-ru.ru.1441ea3d-6414ceca-59779407-74722d776562/https/en.wikipedia.org/wiki/Audio_crossover_capacitor)
 * __Acoustics__
-  * [432Hz & 440Hz](https://samesound.ru/write/116025-432hz-vs-440hz)
+  * [432Hz & 440Hz](https://emastered.com/ru/blog/432-hz-tuning-standard)
   * [Mathematics of the musical system](https://rainy-sunny.livejournal.com/403437.html)
 ***
 ![Frequency ranges](http://musmaker.ru/images/content/education/FrequencyRange.jpg)
