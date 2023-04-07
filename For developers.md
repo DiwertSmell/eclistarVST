@@ -13,7 +13,7 @@ __Full documentation is__ [___here___](https://docs.juce.com/develop/index.html)
 * __JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR__ - This is a shorthand way of writing both a JUCE_DECLARE_NON_COPYABLE and JUCE_LEAK_DETECTOR macro for a class.
 ##### Functions
 * [__DSP__](https://docs.juce.com/master/tutorial_dsp_introduction.html) full documentation
-* [__GUI__](https://docs.juce.com/master/classDocumentWindow.html) some documentation
+* [__GUI__](https://docs.juce.com/master/group__juce__gui__basics.html) some documentation
 * [__ValueTree__](https://docs.juce.com/master/tutorial_value_tree.html) documentation
 * __jassert()__ - Platform-independent assertion macro. Defined as a function.
 
