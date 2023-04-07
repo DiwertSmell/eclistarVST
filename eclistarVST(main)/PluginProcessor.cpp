@@ -218,9 +218,9 @@ void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    for (auto& filter_buffer : _multiFilterBuffers)
+    for (auto& filterBuffer : _multiFilterBuffers)
     {
-        filter_buffer = buffer;
+        filterBuffer = buffer;
     }
 
     // Audio cutoff for channels
