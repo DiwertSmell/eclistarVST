@@ -110,8 +110,8 @@ public:
 
     void processing(AudioBuffer<float>& buffer)
     {
-        auto audio_block = AudioBlock<float>(buffer);
-        auto context = ProcessContextReplacing<float>(audio_block);
+        auto audioBlock = AudioBlock<float>(buffer);
+        auto context = ProcessContextReplacing<float>(audioBlock);
 
         context.isBypassed = bypassed->get();
 
@@ -129,11 +129,13 @@ class EclistarVSTAudioProcessor  : public AudioProcessor
 public:
 
     EclistarVSTAudioProcessor();
+
     ~EclistarVSTAudioProcessor() override;
 
 //==============================================================================
 
-    void prepareToPlay (double sample_rate, int samples_per_block) override;
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+
     void releaseResources() override;
 
    #ifndef JucePlugin_PreferredChannelConfigurations
@@ -145,6 +147,7 @@ public:
 //==============================================================================
 
     AudioProcessorEditor* createEditor() override;
+
     bool hasEditor() const override;
 
 //==============================================================================
@@ -152,22 +155,30 @@ public:
     const String getName() const override;
 
     bool acceptsMidi() const override;
+
     bool producesMidi() const override;
+
     bool isMidiEffect() const override;
+
     double getTailLengthSeconds() const override;
 
 //==============================================================================
 
     int getNumPrograms() override;
+
     int getCurrentProgram() override;
+
     void setCurrentProgram (int index) override;
+
     const String getProgramName (int index) override;
-    void changeProgramName (int index, const String& new_name) override;
+
+    void changeProgramName (int index, const String& newName) override;
 
 //==============================================================================
 
-    void getStateInformation (MemoryBlock& destination_data) override;
-    void setStateInformation (const void* data, int size_in_bytes) override;
+    void getStateInformation (MemoryBlock& destinationData) override;
+
+    void setStateInformation (const void* data, int sizeInBytes) override;
 
     using APVTS = AudioProcessorValueTreeState;
     static APVTS::ParameterLayout createParameterLayout();
@@ -181,15 +192,23 @@ private:
 
     VstCompressorBand _compressor;
 
+
     using Filter = LinkwitzRileyFilter<float>;
-    Filter _LP,
-           _HP,
-           _AP;
 
-    AudioParameterFloat* _low_mid_crossover{ nullptr };
+    Filter _lowPass1;
+    Filter _lowPass2;
 
-    AudioBuffer<float> _all_pass_buffer;
-    array<AudioBuffer<float>, 2> _multi_filter_buffers;
+    Filter _highPass1;
+    Filter _highPass2;
+
+    Filter _allPass2;
+
+
+    AudioParameterFloat* _lowMidCrossover{ nullptr };
+    AudioParameterFloat* _midHighCrossover{ nullptr };
+
+    AudioBuffer<float> _allPassBuffer;
+    array<AudioBuffer<float>, 3> _multiFilterBuffers;
 
 //==============================================================================
 
