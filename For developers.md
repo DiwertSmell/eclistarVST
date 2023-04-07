@@ -6,7 +6,7 @@ Next, the main elements will be given to simplify not so much reading as underst
 __Full documentation is__ [___here___](https://docs.juce.com/develop/index.html)
 ***
 ### JUCE elements
-##### MACROS
+##### Macros
 * __JUCE_CALLTYPE__ - This macro defines the C calling convention used as the standard for JUCE calls.
 * __JUCE_LEAK_DETECTOR__ - This macro lets you embed a leak-detecting object inside a class.
 * __JUCE_DECLARE__ _ __NON_COPYABLE__ - This is a shorthand macro for deleting a class's copy constructor and copy assignment operator.
