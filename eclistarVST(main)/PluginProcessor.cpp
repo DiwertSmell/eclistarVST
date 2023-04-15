@@ -4,26 +4,25 @@
 using namespace compressor_parameters;
 
 //==============================================================================
-// The main system elements of the compressor
+// The main system elements of the compressor.
 
 EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", AudioChannelSet::stereo(), true)
+#endif
+    )
 #endif
 {
-    // Next, parameter casting is implemented using simplified lambda functions
+    // Next, parameter casting is implemented using simplified lambda functions.
 
     const auto& parameters = GetParameters();
 
-
-    // Choice cast
+    // Choice cast.
 
     auto ChoiceCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
     {
@@ -31,7 +30,7 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
         jassert(parameter != nullptr);
     };
 
-    // Float cast
+    // Float cast.
 
     auto FloatCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
     {
@@ -39,7 +38,7 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
         jassert(parameter != nullptr);
     };
 
-    // Bool cast
+    // Bool cast.
 
     auto BoolCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
     {
@@ -47,20 +46,41 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
         jassert(parameter != nullptr);
     };
 
+    // Application of lambda functions:
 
-    // Application of lambda functions
+    // Low compressor;
 
-    FloatCastHelper(_compressor.attack, NamesOfParameters::attackLowBand);
-    FloatCastHelper(_compressor.release, NamesOfParameters::releaseLowBand);
+    FloatCastHelper(_lowCompressor.attack, NamesOfParameters::attackLowBand);
+    FloatCastHelper(_lowCompressor.release, NamesOfParameters::releaseLowBand);
+    FloatCastHelper(_lowCompressor.threshold, NamesOfParameters::thresholdLowBand);
+
+    ChoiceCastHelper(_lowCompressor.ratio, NamesOfParameters::ratioLowBand);
+    BoolCastHelper(_lowCompressor.bypassed, NamesOfParameters::bypassedLowBand);
+
+    // Middle compressor;
+
+    FloatCastHelper(_midCompressor.attack, NamesOfParameters::attackMidBand);
+    FloatCastHelper(_midCompressor.release, NamesOfParameters::releaseMidBand);
+    FloatCastHelper(_midCompressor.threshold, NamesOfParameters::thresholdMidBand);
+
+    ChoiceCastHelper(_midCompressor.ratio, NamesOfParameters::ratioMidBand);
+    BoolCastHelper(_midCompressor.bypassed, NamesOfParameters::bypassedMidBand);
+
+    // High Compressor;
+
+    FloatCastHelper(_highCompressor.attack, NamesOfParameters::attackHighBand);
+    FloatCastHelper(_highCompressor.release, NamesOfParameters::releaseHighBand);
+    FloatCastHelper(_highCompressor.threshold, NamesOfParameters::thresholdHighBand);
+
+    ChoiceCastHelper(_highCompressor.ratio, NamesOfParameters::ratioHighBand);
+    BoolCastHelper(_highCompressor.bypassed, NamesOfParameters::bypassedHighBand);
+
+    // Crossovers.
+
     FloatCastHelper(_lowMidCrossover, NamesOfParameters::lowMidCrossoverFreq);
-    FloatCastHelper(_compressor.threshold, NamesOfParameters::thresholdLowBand);
     FloatCastHelper(_midHighCrossover, NamesOfParameters::midHighCrossoverFreq);
 
-    ChoiceCastHelper(_compressor.ratio, NamesOfParameters::ratioLowBand);
-
-    BoolCastHelper(_compressor.bypassed, NamesOfParameters::bypassedLowBand);
-
-    // Determining channel parameters
+    // Determining channel parameters.
 
     _lowPass1.setType(LinkwitzRileyFilterType::lowpass);
     _highPass1.setType(LinkwitzRileyFilterType::highpass);
@@ -78,33 +98,33 @@ EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
 
 //==============================================================================
 // This block contains system functions that currently do not contain
-// and do not require to contain anything
+// and do not require to contain anything.
 
 bool EclistarVSTAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool EclistarVSTAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool EclistarVSTAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double EclistarVSTAudioProcessor::getTailLengthSeconds() const
@@ -114,7 +134,7 @@ double EclistarVSTAudioProcessor::getTailLengthSeconds() const
 
 int EclistarVSTAudioProcessor::getNumPrograms()
 {
-    return 1;   
+    return 1;
 }
 
 int EclistarVSTAudioProcessor::getCurrentProgram()
@@ -127,7 +147,7 @@ const String EclistarVSTAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
-const String EclistarVSTAudioProcessor::getProgramName (int index)
+const String EclistarVSTAudioProcessor::getProgramName(int index)
 {
     return {};
 }
@@ -137,16 +157,16 @@ void EclistarVSTAudioProcessor::setCurrentProgram(int index)
     // Empty...
 }
 
-void EclistarVSTAudioProcessor::changeProgramName (int index, const String& newName)
+void EclistarVSTAudioProcessor::changeProgramName(int index, const String& newName)
 {
     // Empty...
 }
 
 //==============================================================================
 // Next, in fact, are the functions of the preprocessor, that is, functions,
-// the result of which entails the success or error of launching the plugin
+// the result of which entails the success or error of launching the plugin.
 
-void EclistarVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void EclistarVSTAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     // Specification of the "music" processor
     // Preparation for processing a musical fragment (sample).
@@ -157,7 +177,14 @@ void EclistarVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     processSpec.numChannels = getTotalNumOutputChannels();
     processSpec.sampleRate = sampleRate;
 
-    _compressor.prepare(processSpec);
+    // Preparing several compressors.
+
+    for (auto& compressor : _compressors)
+    {
+        compressor.prepare(processSpec);
+    }
+
+    // Preparing levels of compressor.
 
     _lowPass1.prepare(processSpec);
     _highPass1.prepare(processSpec);
@@ -167,9 +194,7 @@ void EclistarVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     _allPass2.prepare(processSpec);
 
-
-    _allPassBuffer.setSize(processSpec.numChannels, samplesPerBlock);
-
+    // Setting the size of buffers for transmitting sounds.
 
     for (auto& buffer : _multiFilterBuffers)
     {
@@ -183,47 +208,54 @@ void EclistarVSTAudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool EclistarVSTAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool EclistarVSTAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
+#if JucePlugin_IsMidiEffect
+    ignoreUnused(layouts);
     return true;
-  #else
-    
+#else
+
     if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
         return false;
 
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
 void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    // Operational scope
+    // Operational scope.
 
     ScopedNoDenormals noDenormals;
 
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // Clearing the old channel
+    // Clearing the old channel.
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
+
+    // Update the parameters of all compressors and set the buffer size.
+
+    for (auto& compressor : _compressors)
+    {
+        compressor.updateVstCompressorSettings();
+    }
 
     for (auto& filterBuffer : _multiFilterBuffers)
     {
         filterBuffer = buffer;
     }
 
-    // Audio cutoff for channels
+    // Audio cutoff for channels.
 
     auto lowMidCutoff = _lowMidCrossover->get();
     auto midHighCutoff = _midHighCrossover->get();
@@ -236,18 +268,20 @@ void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 
     _allPass2.setCutoffFrequency(midHighCutoff);
 
-    // Creating a buffer for samples, allocating memory
+    // Creating a buffer for samples, allocating static memory.
 
     auto filterBuf0Block = AudioBlock<float>(_multiFilterBuffers[0]);
     auto filterBuf1Block = AudioBlock<float>(_multiFilterBuffers[1]);
     auto filterBuf2Block = AudioBlock<float>(_multiFilterBuffers[2]);
 
     // ProcessContextReplacing contains contextual information
-    // that is passed to the processing method of the algorithm
+    // that is passed to the processing method of the algorithm.
 
     auto filterBuf0Context = ProcessContextReplacing<float>(filterBuf0Block);
     auto filterBuf1Context = ProcessContextReplacing<float>(filterBuf1Block);
     auto filterBuf2Context = ProcessContextReplacing<float>(filterBuf2Block);
+
+    // Processing levels.
 
     _lowPass1.process(filterBuf0Context);
     _allPass2.process(filterBuf0Context);
@@ -258,69 +292,63 @@ void EclistarVSTAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
     _lowPass2.process(filterBuf1Context);
     _highPass2.process(filterBuf2Context);
 
+    // Determine the size of the data to work with each sub-compressor.
+
+    for (size_t i = 0; i < _multiFilterBuffers.size(); ++i)
+    {
+        _compressors[i].processing(_multiFilterBuffers[i]);
+    }
+
     auto numSamples = buffer.getNumSamples();
     auto numChannels = buffer.getNumChannels();
 
-
     buffer.clear();
 
-    // Buffer exchange with DSP, sound processing
+    // Buffer exchange with DSP, sound processing.
 
-    auto AddFilterBand = [numC = numChannels, numS = numSamples](auto& input_buffer,
-                                                                 const auto& source)
+    auto AddFilterBand = [numC = numChannels, numS = numSamples](auto& inputBuffer,
+        const auto& source)
     {
         for (auto i = 0; i < numC; ++i)
         {
-            input_buffer.addFrom(i, 0, source, i, 0, numS);
+            inputBuffer.addFrom(i, 0, source, i, 0, numS);
         }
     };
 
-    // When the compressor is in bypass mode,
-    // it is necessary to analyze all passing signals
+   // Setting filters, the link between the user and the kernel.
 
     AddFilterBand(buffer, _multiFilterBuffers[0]);
     AddFilterBand(buffer, _multiFilterBuffers[1]);
     AddFilterBand(buffer, _multiFilterBuffers[2]);
-
-    /*if (_compressor.bypassed->get())
-    {
-        for (auto channel = 0; channel < numChannels; channel++)
-        {
-            FloatVectorOperations::multiply(_allPassBuffer.getWritePointer(channel),
-                                            -1.f, numSamples);
-        }
-        AddFilterBand(buffer, _allPassBuffer);
-    }
-    */
 }
 
 //==============================================================================
-// Functions of editor
+// Functions of editor.
 
 bool EclistarVSTAudioProcessor::hasEditor() const
 {
-    return true; 
+    return true;
 }
 
 AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 {
-    return new GenericAudioProcessorEditor (*this);
+    return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-// Data state status
+// Data state status.
 
-void EclistarVSTAudioProcessor::getStateInformation (MemoryBlock& destinationData)
+void EclistarVSTAudioProcessor::getStateInformation(MemoryBlock& destinationData)
 {
-    // The sound went to the right place
+    // The sound went to the right place.
 
     MemoryOutputStream mem_out_stream(destinationData, true);
     apvts.state.writeToStream(mem_out_stream);
 }
 
-void EclistarVSTAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void EclistarVSTAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // A universal structure for storing and interacting data with each other
+    // A universal structure for storing and interacting data with each other.
 
     auto value_tree = ValueTree::readFromData(data, sizeInBytes);
     if (value_tree.isValid())
@@ -330,18 +358,18 @@ void EclistarVSTAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 //==============================================================================
-// Layout, application appearance
+// Layout, application appearance.
 
 AudioProcessorValueTreeState::ParameterLayout
 EclistarVSTAudioProcessor::createParameterLayout()
 {
-    auto attack_re_range = NormalisableRange<float>(5, 500, 1, 1);
-    auto choices_val = vector<double>{ 1,1.5,2,3,4,5,7,9,10,15,20,50,100 };
+    auto attackRange = NormalisableRange<float>(5, 500, 1, 1);
+    auto choicesValues = vector<double>{ 1,1.5,2,3,4,5,7,9,10,15,20,50,100 };
 
-    StringArray str_arr;
-    for (auto choice : choices_val)
+    StringArray strArray;
+    for (auto choice : choicesValues)
     {
-        str_arr.add(String(choice, 1));
+        strArray.add(String(choice, 1));
     }
 
 
@@ -349,40 +377,84 @@ EclistarVSTAudioProcessor::createParameterLayout()
     const auto& parameters = GetParameters();
 
     layout.add(make_unique<AudioParameterChoice>(parameters.at(NamesOfParameters::ratioLowBand),
-                                                 parameters.at(NamesOfParameters::ratioLowBand),
-                                                 str_arr, 3));
+        parameters.at(NamesOfParameters::ratioLowBand),
+        strArray, 3));
 
     layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::thresholdLowBand),
-                                                parameters.at(NamesOfParameters::thresholdLowBand),
-                                                NormalisableRange<float>(-60, 12, 1, 1), 0));
+        parameters.at(NamesOfParameters::thresholdLowBand),
+        NormalisableRange<float>(-60, 12, 1, 1), 0));
 
     layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::attackLowBand),
-                                                parameters.at(NamesOfParameters::attackLowBand),
-                                                attack_re_range, 0));
+        parameters.at(NamesOfParameters::attackLowBand),
+        attackRange, 0));
 
     layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::releaseLowBand),
-                                                parameters.at(NamesOfParameters::releaseLowBand),
-                                                attack_re_range, 250));
+        parameters.at(NamesOfParameters::releaseLowBand),
+        attackRange, 250));
 
     layout.add(make_unique<AudioParameterBool>(parameters.at(NamesOfParameters::bypassedLowBand),
-                                               parameters.at(NamesOfParameters::bypassedLowBand),
-                                               false));
+        parameters.at(NamesOfParameters::bypassedLowBand),
+        false));
+
+
+    layout.add(make_unique<AudioParameterChoice>(parameters.at(NamesOfParameters::ratioMidBand),
+        parameters.at(NamesOfParameters::ratioMidBand),
+        strArray, 3));
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::thresholdMidBand),
+        parameters.at(NamesOfParameters::thresholdMidBand),
+        NormalisableRange<float>(-60, 12, 1, 1), 0));
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::attackMidBand),
+        parameters.at(NamesOfParameters::attackMidBand),
+        attackRange, 0));
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::releaseMidBand),
+        parameters.at(NamesOfParameters::releaseMidBand),
+        attackRange, 250));
+
+    layout.add(make_unique<AudioParameterBool>(parameters.at(NamesOfParameters::bypassedMidBand),
+        parameters.at(NamesOfParameters::bypassedMidBand),
+        false));
+
+
+    layout.add(make_unique<AudioParameterChoice>(parameters.at(NamesOfParameters::ratioHighBand),
+        parameters.at(NamesOfParameters::ratioHighBand),
+        strArray, 3));
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::thresholdHighBand),
+        parameters.at(NamesOfParameters::thresholdHighBand),
+        NormalisableRange<float>(-60, 12, 1, 1), 0));
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::attackHighBand),
+        parameters.at(NamesOfParameters::attackHighBand),
+        attackRange, 0));
+
+    layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::releaseHighBand),
+        parameters.at(NamesOfParameters::releaseHighBand),
+        attackRange, 250));
+
+    layout.add(make_unique<AudioParameterBool>(parameters.at(NamesOfParameters::bypassedHighBand),
+        parameters.at(NamesOfParameters::bypassedHighBand),
+        false));
+
+
 
     layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::lowMidCrossoverFreq),
-                                                parameters.at(NamesOfParameters::lowMidCrossoverFreq),
-                                                NormalisableRange<float>(20, 999, 1, 1),
-                                                400));
+        parameters.at(NamesOfParameters::lowMidCrossoverFreq),
+        NormalisableRange<float>(20, 999, 1, 1),
+        400));
 
     layout.add(make_unique<AudioParameterFloat>(parameters.at(NamesOfParameters::midHighCrossoverFreq),
-                                                parameters.at(NamesOfParameters::midHighCrossoverFreq),
-                                                NormalisableRange<float>(1000, 20000, 1, 1),
-                                                2000));
+        parameters.at(NamesOfParameters::midHighCrossoverFreq),
+        NormalisableRange<float>(1000, 20000, 1, 1),
+        2000));
 
     return layout;
 }
 
 //==============================================================================
-// Creating plugin filters and crossovers
+// Creating plugin filters and crossovers.
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

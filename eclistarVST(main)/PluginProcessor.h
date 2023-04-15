@@ -6,13 +6,13 @@ using namespace juce;
 using namespace dsp;
 using namespace std;
 
-// Namespace of compressor parameters
+// Namespace of compressor parameters.
 
 namespace compressor_parameters
 {
     enum NamesOfParameters
     {
-        // Names of the main parameters
+        // Names of the main parameters.
 
         ratioLowBand,
         ratioMidBand,
@@ -30,7 +30,7 @@ namespace compressor_parameters
         thresholdMidBand,
         thresholdHighBand,
 
-        // Names of additional parameters and channels
+        // Names of additional parameters and channels.
 
         bypassedLowBand,
         bypassedMidBand,
@@ -73,7 +73,7 @@ namespace compressor_parameters
 }
 
 
-// Structure of compressor
+// Structure of compressor.
 
 struct VstCompressorBand
 {
@@ -83,7 +83,7 @@ private:
 
 public:
 
-    // Elements of compressor
+    // Elements of compressor.
 
     AudioParameterChoice* ratio{ nullptr };
 
@@ -93,7 +93,7 @@ public:
     AudioParameterFloat* release{ nullptr };
     AudioParameterFloat* threshold{ nullptr };
 
-    // Functions of the compressor itself
+    // Functions of the compressor itself.
 
     void prepare(const ProcessSpec& process_spec)
     {
@@ -119,12 +119,12 @@ public:
     }
 };
 
-// Class of processor compressor
+// Class of processor compressor.
 
-class EclistarVSTAudioProcessor  : public AudioProcessor
-                            #if JucePlugin_Enable_ARA
-                             , public AudioProcessorARAExtension
-                            #endif
+class EclistarVSTAudioProcessor : public AudioProcessor
+#if JucePlugin_Enable_ARA
+    , public AudioProcessorARAExtension
+#endif
 {
 public:
 
@@ -132,25 +132,25 @@ public:
 
     ~EclistarVSTAudioProcessor() override;
 
-//==============================================================================
+    //==============================================================================
 
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void prepareToPlay(double sampleRate, int samplesPerBlock) override;
 
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
-    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#ifndef JucePlugin_PreferredChannelConfigurations
+    bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
+#endif
 
-    void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
+    void processBlock(AudioBuffer<float>&, MidiBuffer&) override;
 
-//==============================================================================
+    //==============================================================================
 
     AudioProcessorEditor* createEditor() override;
 
     bool hasEditor() const override;
 
-//==============================================================================
+    //==============================================================================
 
     const String getName() const override;
 
@@ -162,23 +162,23 @@ public:
 
     double getTailLengthSeconds() const override;
 
-//==============================================================================
+    //==============================================================================
 
     int getNumPrograms() override;
 
     int getCurrentProgram() override;
 
-    void setCurrentProgram (int index) override;
+    void setCurrentProgram(int index) override;
 
-    const String getProgramName (int index) override;
+    const String getProgramName(int index) override;
 
-    void changeProgramName (int index, const String& newName) override;
+    void changeProgramName(int index, const String& newName) override;
 
-//==============================================================================
+    //==============================================================================
 
-    void getStateInformation (MemoryBlock& destinationData) override;
+    void getStateInformation(MemoryBlock& destinationData) override;
 
-    void setStateInformation (const void* data, int sizeInBytes) override;
+    void setStateInformation(const void* data, int sizeInBytes) override;
 
     using APVTS = AudioProcessorValueTreeState;
     static APVTS::ParameterLayout createParameterLayout();
@@ -187,11 +187,19 @@ public:
 
 
 private:
-//==============================================================================
-// The following are the elements of the compressor, Linkwitz filter
+    //==============================================================================
+    // The following are the elements of the compressor, Linkwitz filter.
+    
+    // Define compressors of three levels.
 
-    VstCompressorBand _compressor;
+    array<VstCompressorBand, 3> _compressors;
 
+    VstCompressorBand& _lowCompressor = _compressors[0];
+    VstCompressorBand& _midCompressor = _compressors[1];
+    VstCompressorBand& _highCompressor = _compressors[2];
+
+    // Apply Linkwitz-Riley filters, which will help with the mechanization
+    // of compressor activity ranges.
 
     using Filter = LinkwitzRileyFilter<float>;
 
@@ -203,14 +211,14 @@ private:
 
     Filter _allPass2;
 
+    // Define crossovers and an audio buffer.
 
     AudioParameterFloat* _lowMidCrossover{ nullptr };
     AudioParameterFloat* _midHighCrossover{ nullptr };
 
-    AudioBuffer<float> _allPassBuffer;
     array<AudioBuffer<float>, 3> _multiFilterBuffers;
 
-//==============================================================================
+    //==============================================================================
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EclistarVSTAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EclistarVSTAudioProcessor)
 };
