@@ -10,7 +10,7 @@ __Full documentation is__ [___here___](https://docs.juce.com/develop/index.html)
 * [__DSP__](https://docs.juce.com/master/tutorial_dsp_introduction.html)
 * [__GUI__](https://docs.juce.com/master/group__juce__gui__basics.html)
 * [__ValueTree__](https://docs.juce.com/master/tutorial_value_tree.html)
-* [Spectrum analyser](https://docs.juce.com/master/tutorial_spectrum_analyser.html)
+* [__Spectrum analyser__](https://docs.juce.com/master/tutorial_spectrum_analyser.html)
 * __jassert()__ - Platform-independent assertion macro. Defined as a function.
 
 ***
