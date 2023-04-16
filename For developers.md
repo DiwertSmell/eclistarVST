@@ -7,14 +7,16 @@ __Full documentation is__ [___here___](https://docs.juce.com/develop/index.html)
 ***
 ### JUCE elements
 ##### Functions
-* [__DSP__](https://docs.juce.com/master/tutorial_dsp_introduction.html) full documentation
-* [__GUI__](https://docs.juce.com/master/group__juce__gui__basics.html) some documentation
-* [__ValueTree__](https://docs.juce.com/master/tutorial_value_tree.html) documentation
+* [__DSP__](https://docs.juce.com/master/tutorial_dsp_introduction.html)
+* [__GUI__](https://docs.juce.com/master/group__juce__gui__basics.html)
+* [__ValueTree__](https://docs.juce.com/master/tutorial_value_tree.html)
+* [Spectrum analyser](https://docs.juce.com/master/tutorial_spectrum_analyser.html)
 * __jassert()__ - Platform-independent assertion macro. Defined as a function.
 
 ***
 # Detailed information
 * __Compression__
+  * [Gain](https://hiphopmakers.com/what-is-gain-in-audio)
   * [ADSR](https://habr.com/ru/post/311750/)
   * [Fifth music system](https://habr.com/ru/post/653621/) 
   * [Multiband Compression](https://emastered.com/blog/what-is-multiband-compression)
