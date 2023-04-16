@@ -6,6 +6,7 @@ using namespace juce;
 using namespace dsp;
 using namespace std;
 
+//==============================================================================================
 // Namespace of compressor parameters.
 
 namespace compressor_parameters
@@ -32,6 +33,17 @@ namespace compressor_parameters
 
         // Names of additional parameters and channels.
 
+        gainInput,
+        gainOutput,
+
+        soloLowBand,
+        soloMidBand,
+        soloHighBand,
+
+        muteLowBand,
+        muteMidBand,
+        muteHighBand,
+
         bypassedLowBand,
         bypassedMidBand,
         bypassedHighBand,
@@ -42,37 +54,49 @@ namespace compressor_parameters
 
     const map<NamesOfParameters, String>& GetParameters()
     {
-        static map<NamesOfParameters, String> parameters =
+        static map <NamesOfParameters, String> parameters =
         {
-            { ratioLowBand, "Ratio Low Band" },
-            { ratioMidBand, "Ratio Mid Band" },
-            { ratioHighBand, "Ratio High Band" },
+            { ratioLowBand, "ratio low band" },
+            { ratioMidBand, "ratio mid band" },
+            { ratioHighBand, "Ratio high Band" },
 
-            { attackLowBand, "Attack Low Band" },
-            { attackMidBand, "Attack Mid Band" },
-            { attackHighBand, "Attack High Band" },
+            { attackLowBand, "attack low band" },
+            { attackMidBand, "attack mid band" },
+            { attackHighBand, "attack high band" },
 
-            { releaseLowBand, "Release Low Band" },
-            { releaseMidBand, "Release Mid Band" },
-            { releaseHighBand, "Release High Band" },
+            { releaseLowBand, "release low band" },
+            { releaseMidBand, "release mid band" },
+            { releaseHighBand, "release high band" },
 
-            { thresholdLowBand, "Threshold Low Band" },
-            { thresholdMidBand, "Threshold Mid Band" },
-            { thresholdHighBand, "Threshold High Band" },
+            { thresholdLowBand, "threshold low band" },
+            { thresholdMidBand, "threshold mid band" },
+            { thresholdHighBand, "threshold high band" },
 
-            { bypassedLowBand, "Bypassed Low Band" },
-            { bypassedMidBand, "Bypassed Mid Band" },
-            { bypassedHighBand, "Bypassed High Band" },
 
-            { lowMidCrossoverFreq, "Low-Mid Crossover Frequency" },
-            { midHighCrossoverFreq, "Mid-High Crossover Frequency" }
+            { gainInput, "gain in" },
+            { gainOutput, "gain out" },
+
+            { soloLowBand, "solo low band" },
+            { soloMidBand, "solo mid band" },
+            { soloHighBand, "solo high band" },
+
+            { muteLowBand, "mute low band" },
+            { muteMidBand, "mute mid band" },
+            { muteHighBand, "mute high band" },
+
+            { bypassedLowBand, "bypassed low band" },
+            { bypassedMidBand, "bypassed mid band" },
+            { bypassedHighBand, "bypassed high band" },
+
+            { lowMidCrossoverFreq, "low-mid crossover frequency" },
+            { midHighCrossoverFreq, "mid-high crossover frequency" }
         };
 
         return parameters;
     }
 }
 
-
+//==============================================================================================
 // Structure of compressor.
 
 struct VstCompressorBand
@@ -85,13 +109,15 @@ public:
 
     // Elements of compressor.
 
-    AudioParameterChoice* ratio{ nullptr };
+    AudioParameterChoice* ratio { nullptr };
 
-    AudioParameterBool* bypassed{ nullptr };
+    AudioParameterBool* solo { nullptr };
+    AudioParameterBool* mute { nullptr };
+    AudioParameterBool* bypassed { nullptr };
 
-    AudioParameterFloat* attack{ nullptr };
-    AudioParameterFloat* release{ nullptr };
-    AudioParameterFloat* threshold{ nullptr };
+    AudioParameterFloat* attack { nullptr };
+    AudioParameterFloat* release { nullptr };
+    AudioParameterFloat* threshold { nullptr };
 
     // Functions of the compressor itself.
 
@@ -108,10 +134,10 @@ public:
         _compressor_.setRatio(ratio->getCurrentChoiceName().getFloatValue());
     }
 
-    void processing(AudioBuffer<float>& buffer)
+    void processing(AudioBuffer <float>& buffer)
     {
-        auto audioBlock = AudioBlock<float>(buffer);
-        auto context = ProcessContextReplacing<float>(audioBlock);
+        auto audioBlock = AudioBlock <float> (buffer);
+        auto context = ProcessContextReplacing <float> (audioBlock);
 
         context.isBypassed = bypassed->get();
 
@@ -119,6 +145,7 @@ public:
     }
 };
 
+//==============================================================================================
 // Class of processor compressor.
 
 class EclistarVSTAudioProcessor : public AudioProcessor
@@ -132,7 +159,7 @@ public:
 
     ~EclistarVSTAudioProcessor() override;
 
-    //==============================================================================
+//==============================================================================================
 
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
 
@@ -144,13 +171,13 @@ public:
 
     void processBlock(AudioBuffer<float>&, MidiBuffer&) override;
 
-    //==============================================================================
+//==============================================================================================
 
     AudioProcessorEditor* createEditor() override;
 
     bool hasEditor() const override;
 
-    //==============================================================================
+//==============================================================================================
 
     const String getName() const override;
 
@@ -162,7 +189,7 @@ public:
 
     double getTailLengthSeconds() const override;
 
-    //==============================================================================
+//==============================================================================================
 
     int getNumPrograms() override;
 
@@ -174,7 +201,7 @@ public:
 
     void changeProgramName(int index, const String& newName) override;
 
-    //==============================================================================
+//==============================================================================================
 
     void getStateInformation(MemoryBlock& destinationData) override;
 
@@ -187,12 +214,12 @@ public:
 
 
 private:
-    //==============================================================================
+//==============================================================================================
     // The following are the elements of the compressor, Linkwitz filter.
     
     // Define compressors of three levels.
 
-    array<VstCompressorBand, 3> _compressors;
+    array <VstCompressorBand, 3> _compressors;
 
     VstCompressorBand& _lowCompressor = _compressors[0];
     VstCompressorBand& _midCompressor = _compressors[1];
@@ -201,7 +228,7 @@ private:
     // Apply Linkwitz-Riley filters, which will help with the mechanization
     // of compressor activity ranges.
 
-    using Filter = LinkwitzRileyFilter<float>;
+    using Filter = LinkwitzRileyFilter <float>;
 
     Filter _lowPass1;
     Filter _lowPass2;
@@ -211,14 +238,34 @@ private:
 
     Filter _allPass2;
 
+    // Creating gain parameters.
+
+    Gain <float> _inGain;
+    Gain <float> _outGain;
+
+    AudioParameterFloat* _inputGain;
+    AudioParameterFloat* _outputGain;
+
     // Define crossovers and an audio buffer.
 
-    AudioParameterFloat* _lowMidCrossover{ nullptr };
-    AudioParameterFloat* _midHighCrossover{ nullptr };
+    AudioParameterFloat* _lowMidCrossover { nullptr };
+    AudioParameterFloat* _midHighCrossover { nullptr };
 
-    array<AudioBuffer<float>, 3> _multiFilterBuffers;
+    array <AudioBuffer <float>, 3> _multiFilterBuffers;
 
-    //==============================================================================
+    // Apply the gain & gain context.
+
+    template <typename B, typename G>
+    void ApplyGain(B& buffer, G& gain)
+    {
+        auto audioBlock = AudioBlock <float> (buffer);
+        auto context = ProcessContextReplacing <float>(audioBlock);
+
+        gain.process(context);
+    }
+
+
+//==============================================================================================
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EclistarVSTAudioProcessor)
 };
