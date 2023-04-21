@@ -13,7 +13,4 @@ It is based on the classical structures of MIDI plug-ins, [DSP](https://ru.wikip
 ### Thankfulness
 * [Martin Finke](https://www.martin-finke.de/tags/making_audio_plugins.html)
 
-***
-!Неважно
-APVTS = {0,6; 0,03; 0,034; 0,05; 0,075; 0,09; 0,14; 0,6;  1,0; 2,4; 5,0}
 
