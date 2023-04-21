@@ -5,6 +5,8 @@
 
 using namespace juce;
 
+//==============================================================================================
+// Class of compressor's editor
 
 class EclistarVSTAudioProcessorEditor : public AudioProcessorEditor
 {

@@ -109,15 +109,15 @@ public:
 
     // Elements of compressor.
 
-    AudioParameterChoice* ratio { nullptr };
+    AudioParameterChoice* ratio{ nullptr };
 
-    AudioParameterBool* solo { nullptr };
-    AudioParameterBool* mute { nullptr };
-    AudioParameterBool* bypassed { nullptr };
+    AudioParameterBool* solo{ nullptr };
+    AudioParameterBool* mute{ nullptr };
+    AudioParameterBool* bypassed{ nullptr };
 
-    AudioParameterFloat* attack { nullptr };
-    AudioParameterFloat* release { nullptr };
-    AudioParameterFloat* threshold { nullptr };
+    AudioParameterFloat* attack{ nullptr };
+    AudioParameterFloat* release{ nullptr };
+    AudioParameterFloat* threshold{ nullptr };
 
     // Functions of the compressor itself.
 
@@ -136,8 +136,8 @@ public:
 
     void processing(AudioBuffer <float>& buffer)
     {
-        auto audioBlock = AudioBlock <float> (buffer);
-        auto context = ProcessContextReplacing <float> (audioBlock);
+        auto audioBlock = AudioBlock <float>(buffer);
+        auto context = ProcessContextReplacing <float>(audioBlock);
 
         context.isBypassed = bypassed->get();
 
@@ -215,8 +215,8 @@ public:
 
 private:
 //==============================================================================================
-    // The following are the elements of the compressor, Linkwitz filter.
-    
+// The following are the elements of the compressor, Linkwitz filter.
+
     // Define compressors of three levels.
 
     array <VstCompressorBand, 3> _compressors;
@@ -248,22 +248,22 @@ private:
 
     // Define crossovers and an audio buffer.
 
-    AudioParameterFloat* _lowMidCrossover { nullptr };
-    AudioParameterFloat* _midHighCrossover { nullptr };
+    AudioParameterFloat* _lowMidCrossover{ nullptr };
+    AudioParameterFloat* _midHighCrossover{ nullptr };
 
     array <AudioBuffer <float>, 3> _multiFilterBuffers;
 
     // Apply the gain & gain context.
 
     template <typename B, typename G>
+
     void ApplyGain(B& buffer, G& gain)
     {
-        auto audioBlock = AudioBlock <float> (buffer);
+        auto audioBlock = AudioBlock <float>(buffer);
         auto context = ProcessContextReplacing <float>(audioBlock);
 
         gain.process(context);
     }
-
 
 //==============================================================================================
 

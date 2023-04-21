@@ -6,7 +6,7 @@
 EclistarVSTAudioProcessorEditor::EclistarVSTAudioProcessorEditor(EclistarVSTAudioProcessor& processor)
     : AudioProcessorEditor(&processor), audio_processor(processor)
 {
-    setSize(400, 300);
+    setSize(600, 500);
 }
 
 EclistarVSTAudioProcessorEditor::~EclistarVSTAudioProcessorEditor()
@@ -17,7 +17,6 @@ EclistarVSTAudioProcessorEditor::~EclistarVSTAudioProcessorEditor()
 
 void EclistarVSTAudioProcessorEditor::paint(Graphics& graphics)
 {
-
     graphics.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
     graphics.setColour(Colours::white);
@@ -27,5 +26,4 @@ void EclistarVSTAudioProcessorEditor::paint(Graphics& graphics)
 
 void EclistarVSTAudioProcessorEditor::resized()
 {
-
 }
