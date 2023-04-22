@@ -409,9 +409,7 @@ bool EclistarVSTAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 {
-
-    return new EclistarVSTAudioProcessorEditor(*this);
-    // return new GenericAudioProcessorEditor(*this);
+    return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================================
