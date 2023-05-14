@@ -48,9 +48,13 @@ namespace compressor_parameters
         bypassedMidBand,
         bypassedHighBand,
 
+        // Names of crossovers.
+
         lowMidCrossoverFreq,
         midHighCrossoverFreq,
     };
+
+    // Correlation of parameters and their names when determining on the layout.
 
     const map<NamesOfParameters, String>& GetParameters()
     {
@@ -103,7 +107,7 @@ struct VstCompressorBand
 {
 private:
 
-    Compressor<float> _compressor_;
+    Compressor<float> _compressor;
 
 public:
 
@@ -123,15 +127,15 @@ public:
 
     void prepare(const ProcessSpec& process_spec)
     {
-        _compressor_.prepare(process_spec);
+        _compressor.prepare(process_spec);
     }
 
     void updateVstCompressorSettings()
     {
-        _compressor_.setAttack(attack->get());
-        _compressor_.setRelease(release->get());
-        _compressor_.setThreshold(threshold->get());
-        _compressor_.setRatio(ratio->getCurrentChoiceName().getFloatValue());
+        _compressor.setAttack(attack->get());
+        _compressor.setRelease(release->get());
+        _compressor.setThreshold(threshold->get());
+        _compressor.setRatio(ratio->getCurrentChoiceName().getFloatValue());
     }
 
     void processing(AudioBuffer <float>& buffer)
@@ -141,7 +145,7 @@ public:
 
         context.isBypassed = bypassed->get();
 
-        _compressor_.process(context);
+        _compressor.process(context);
     }
 };
 
@@ -207,9 +211,13 @@ public:
 
     void setStateInformation(const void* data, int sizeInBytes) override;
 
-    using APVTS = AudioProcessorValueTreeState;
-    static APVTS::ParameterLayout createParameterLayout();
+    // Creating a tree of audio parameter values.
 
+    using APVTS = AudioProcessorValueTreeState;
+
+    // Linking the value tree and the layout of the parameters display.
+
+    static APVTS::ParameterLayout createParameterLayout();
     APVTS apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
 
@@ -240,10 +248,10 @@ private:
 
     // Creating gain parameters.
 
-    Gain <float> _inGain;
-    Gain <float> _outGain;
+    Gain <float> _inGain;                            // values
+    Gain <float> _outGain;      
 
-    AudioParameterFloat* _inputGain;
+    AudioParameterFloat* _inputGain;        // parameters    
     AudioParameterFloat* _outputGain;
 
     // Define crossovers and an audio buffer.

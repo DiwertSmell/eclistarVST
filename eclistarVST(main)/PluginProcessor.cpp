@@ -19,32 +19,37 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
 #endif
 {
     //---------------------------------------------------------------------
-    // Next, parameter casting is implemented
-    // using simplified lambda functions.
+    // Next, parameter casting is implemented using simplified lambda functions.
 
     const auto& parameters = GetParameters();
 
     // Choice cast.
 
-    auto ChoiceCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
+    auto ChoiceCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, 
+                                                                                                      const auto& parameterName)
     {
-        parameter = dynamic_cast <AudioParameterChoice*> (apvts.getParameter(parameters.at(parameterName)));
+        parameter = dynamic_cast <AudioParameterChoice*> (apvts.getParameter
+                                                                                             (parameters.at(parameterName)));
         jassert(parameter != nullptr);
     };
 
     // Float cast.
 
-    auto FloatCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
+    auto FloatCastHelper = [&apvts = this->apvts, &parameters](auto& parameter,
+                                                                                                   const auto& parameterName)
     {
-        parameter = dynamic_cast <AudioParameterFloat*> (apvts.getParameter(parameters.at(parameterName)));
+        parameter = dynamic_cast <AudioParameterFloat*> (apvts.getParameter
+                                                                                           (parameters.at(parameterName)));
         jassert(parameter != nullptr);
     };
 
     // Bool cast.
 
-    auto BoolCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, const auto& parameterName)
+    auto BoolCastHelper = [&apvts = this->apvts, &parameters](auto& parameter,
+                                                                                                  const auto& parameterName)
     {
-        parameter = dynamic_cast <AudioParameterBool*> (apvts.getParameter(parameters.at(parameterName)));
+        parameter = dynamic_cast <AudioParameterBool*> (apvts.getParameter
+                                                                                          (parameters.at(parameterName)));
         jassert(parameter != nullptr);
     };
 
@@ -97,7 +102,7 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
     FloatCastHelper(_lowMidCrossover, NamesOfParameters::lowMidCrossoverFreq);
     FloatCastHelper(_midHighCrossover, NamesOfParameters::midHighCrossoverFreq);
 
-    // Determining channel parameters.
+    // Determining filters parameters.
 
     _lowPass1.setType(LinkwitzRileyFilterType::lowpass);
     _highPass1.setType(LinkwitzRileyFilterType::highpass);
@@ -110,7 +115,7 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
 
 EclistarVSTAudioProcessor::~EclistarVSTAudioProcessor()
 {
-    // Empty...
+    // nothing.
 }
 
 //==============================================================================================
@@ -171,17 +176,16 @@ const String EclistarVSTAudioProcessor::getProgramName(int index)
 
 void EclistarVSTAudioProcessor::setCurrentProgram(int index)
 {
-    // Empty...
+    // nothing.
 }
 
 void EclistarVSTAudioProcessor::changeProgramName(int index, const String& newName)
 {
-    // Empty...
+    // nothing.
 }
 
 //==============================================================================================
-// Next, in fact, are the functions of the preprocessor, that is, functions,
-// the result of which entails the success or error of launching the plugin.
+// Next are the functions responsible for the preparation and processing of sound.
 
 void EclistarVSTAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
@@ -229,7 +233,7 @@ void EclistarVSTAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
 void EclistarVSTAudioProcessor::releaseResources()
 {
-    // Empty...
+    // nothing.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -409,6 +413,8 @@ bool EclistarVSTAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* EclistarVSTAudioProcessor::createEditor()
 {
+
+    //return new EclistarVSTAudioProcessorEditor(*this);
     return new GenericAudioProcessorEditor(*this);
 }
 
@@ -441,11 +447,9 @@ AudioProcessorValueTreeState::ParameterLayout
 EclistarVSTAudioProcessor::createParameterLayout()
 {
     auto attackRange = NormalisableRange <float>(5, 500, 1, 1);
-    auto choicesValues = vector <double>{ 1,1.5,2,3,4,5,7,9,10,15,20,50,100 };
-
     auto gainRange = NormalisableRange <float>(-24.f, 24.f, 0.5f, 1.f);
 
-
+    auto choicesValues = vector <double>{ 1,1.5,2,3,4,5,7,9,10,15,20,50,100 };
     StringArray strArray;
     for (auto choice : choicesValues)
     {
@@ -559,7 +563,7 @@ EclistarVSTAudioProcessor::createParameterLayout()
 }
 
 //==============================================================================================
-// Creating plugin filters and crossovers.
+// Creating plugin.
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
