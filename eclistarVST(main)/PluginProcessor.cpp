@@ -26,30 +26,30 @@ EclistarVSTAudioProcessor::EclistarVSTAudioProcessor()
     // Choice cast.
 
     auto ChoiceCastHelper = [&apvts = this->apvts, &parameters](auto& parameter, 
-                                                                                                      const auto& parameterName)
+                                                                const auto& parameterName)
     {
         parameter = dynamic_cast <AudioParameterChoice*> (apvts.getParameter
-                                                                                             (parameters.at(parameterName)));
+                                                         (parameters.at(parameterName)));
         jassert(parameter != nullptr);
     };
 
     // Float cast.
 
     auto FloatCastHelper = [&apvts = this->apvts, &parameters](auto& parameter,
-                                                                                                   const auto& parameterName)
+                                                               const auto& parameterName)
     {
         parameter = dynamic_cast <AudioParameterFloat*> (apvts.getParameter
-                                                                                           (parameters.at(parameterName)));
+                                                        (parameters.at(parameterName)));
         jassert(parameter != nullptr);
     };
 
     // Bool cast.
 
     auto BoolCastHelper = [&apvts = this->apvts, &parameters](auto& parameter,
-                                                                                                  const auto& parameterName)
+                                                              const auto& parameterName)
     {
         parameter = dynamic_cast <AudioParameterBool*> (apvts.getParameter
-                                                                                          (parameters.at(parameterName)));
+                                                       (parameters.at(parameterName)));
         jassert(parameter != nullptr);
     };
 
