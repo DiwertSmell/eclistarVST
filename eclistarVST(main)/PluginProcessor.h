@@ -248,7 +248,7 @@ private:
 
     // Creating gain parameters.
 
-    Gain <float> _inGain;                            // values
+    Gain <float> _inGain;                   // values
     Gain <float> _outGain;      
 
     AudioParameterFloat* _inputGain;        // parameters    
